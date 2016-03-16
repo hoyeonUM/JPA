@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
+
+
+	<named-native-query	name="Board.boardNativeQueryTestXml" result-set-mapping="boardNativeQueryTestRsultMap">
+		<query>
+ 			 SELECT * FROM BOARD WHERE TITLE = :title
+  		</query>
+  		
+	</named-native-query>
+		<sql-result-set-mapping name="boardNativeQueryTestRsultMap">
+			<entity-result entity-class="web.domain.Board"/>
+		</sql-result-set-mapping>
+
+</entity-mappings>

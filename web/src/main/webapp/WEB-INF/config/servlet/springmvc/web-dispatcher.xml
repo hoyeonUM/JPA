@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+                
+
+
+    <!-- 	페이징 추가 -->
+    <mvc:annotation-driven>
+    <mvc:argument-resolvers>
+        <ref bean="sortResolver"/>
+        <ref bean="pageableResolver" />
+    </mvc:argument-resolvers>
+	</mvc:annotation-driven>
+	
+	<bean id="sortResolver" class="org.springframework.data.web.SortHandlerMethodArgumentResolver" />
+	<bean id="pageableResolver" class="org.springframework.data.web.PageableHandlerMethodArgumentResolver">
+	    <constructor-arg ref="sortResolver" />
+	    <property name="oneIndexedParameters" value="true"/> <!-- 페이징 1부터시작하게하기위해서 -->
+	</bean>
+	
+	
+    <!-- 패키지 내 Controller, Service, Repository 클래스의 auto detect를 위한 mvc 설정 -->
+    <context:component-scan base-package="web">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+
+    <!-- ReqeustMapping 과 Controller 클래스 매핑을 위한 annotation mvc 설정 -->
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
+
+    <!-- 서블릿컨네이너상의 exception에 대한 오류 페이지를 연결하는 mvc 설정-->
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="defaultErrorView" value="cmm/error/egovError"/>
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.springframework.dao.DataAccessException">cmm/error/dataAccessFailure</prop>
+                <prop key="org.springframework.transaction.TransactionException">cmm/error/transactionFailure</prop>
+                <prop key="org.springframework.security.AccessDeniedException">cmm/error/accessDenied</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- 화면처리용 JSP 파일명의  prefix, suffix 처리에 대한 mvc 설정  -->
+  <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/web/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+	<bean class="org.springframework.web.servlet.handler.SimpleServletHandlerAdapter"/>
+	<!-- <bean id="jacksonMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" /> -->
+	
+	<!-- 
+		일단 DispatcherServlet을 그냥 /에 매핑한다.
+		 jsp와 같은 특정 확장자를 가진 URL말고는 모두 DispatcherServlet이 다 받는다.
+		  일단 스프링의 기본 등록된 핸들러 매핑 전략을 이용해서 컨트롤러를 매핑해본다.
+		   @Controller가 담당하는 URL이라면 그리로 넘어갈거고. 그런데 그러다보면 /js/jquery.js 처럼 컨트롤러에 매핑안되는 URL이 나올 것이다.
+		    이런 나머지 모든 URL은 <mvc:default-servlet-handler/>이 내부적으로 등록해주는 DefaultServletHttpRequestHandler이 담당한다. 
+		    이 핸들러(컨트롤러)는 /**로 매핑되어있다. 대신 핸들러 매핑 우선순위가 가장 낮다. 따라서 애노테이션 매핑 등등을 거쳐서 다 실패한 URL만 넘어온다. 
+		    그리고 DefaultServletHttpRequestHandler는 이 요청을 자신이 직접 스태틱 리소스를 읽어서 처리하는 것이 아니라, 원래 서버가 제공하는 디폴트 서블릿으로 넘겨버린다. 
+		    그러면 서버의 기본 디폴트 서블릿이 동작해서 스태틱리소스를 처리해버리는 것이다. 일단 스프링이 다 받고 스프링이 처리 못하는 건 다시 서버의 디폴트 서블릿으로 넘긴다는 아이디어이다.
+		    출처 http://kwonnam.pe.kr/wiki/springframework/mvc
+	 -->
+    <mvc:default-servlet-handler/>
+    
+    
+    <!--
+	
+		 OSIV 설정부분 
+		영속성 컨텍스트의 생존범위를 넓혀주기위해서사용한다.
+	 -->
+    <mvc:interceptors>
+        <bean class="org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor">
+            <property name="entityManagerFactory" ref="entityManagerFactory" />
+        </bean>
+    </mvc:interceptors>
+    
+    
+     <!-- MULTIPART RESOLVERS -->
+    <!-- regular spring resolver -->    
+   <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+    <!-- 로그인 체크가 필요한 URL과 로그인 여부를 체크해준다 -->
+    <!-- <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path=""/>
+            <mvc:exclude-mapping path=""/>
+		    <bean class="web.common.interceptor.~" />
+        </mvc:interceptor>
+    </mvc:interceptors> -->
+    
+    
+    
+
+
+</beans>
