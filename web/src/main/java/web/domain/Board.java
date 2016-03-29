@@ -32,7 +32,7 @@ public class Board {
 	private BoardType boardType;
 	
 	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<BoardFile> BoardFileList = new ArrayList<BoardFile>();
+    private List<BoardFile> boardFileList = new ArrayList<BoardFile>();
 
 	
 	@Column(name = "TITLE",nullable=false)
@@ -189,11 +189,11 @@ public class Board {
 	}
 
 	public List<BoardFile> getBoardFileList() {
-		return BoardFileList;
+		return boardFileList;
 	}
 
 	public void setBoardFileList(List<BoardFile> boardFileList) {
-		BoardFileList = boardFileList;
+		this.boardFileList = boardFileList;
 	}
 
 	

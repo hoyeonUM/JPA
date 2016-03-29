@@ -39,7 +39,7 @@ public class BoardRepositoryImpl extends QueryDslSupport<Board, QBoard> implemen
 	 private EntityManager em;
 	 
 	@Override 
- 	public Page<Board>  selectList(BoardSearch board , Pageable page) throws Exception{
+ 	public Page<Board>  selectList (BoardSearch board , Pageable page) throws Exception{
 		 
 		 QBoard Qboard = QBoard.board;
 		 JPAQuery query= new JPAQuery(em);
@@ -59,6 +59,7 @@ public class BoardRepositoryImpl extends QueryDslSupport<Board, QBoard> implemen
 		 return list;
 		
 	 }
+
 
 	 
 }
